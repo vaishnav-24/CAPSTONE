@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}ShopLite — Home{% endblock %}
+
+{% block content %}
+<section class="hero rounded-4 p-5 mb-5 text-white shadow-sm">
+  <div class="row align-items-center">
+    <div class="col-lg-8">
+      <h1 class="display-5 fw-bold mb-2">Quality finds, simple checkout.</h1>
+      <p class="lead mb-4">A clean storefront built for our Azure DevOps CI/CD capstone.</p>
+      <a href="{{ url_for('shop.products') }}" class="btn btn-warning btn-lg fw-semibold">
+        <i class="bi bi-bag-heart me-1"></i> Shop now
+      </a>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="d-flex justify-content-between align-items-end mb-3">
+    <h2 class="h4 mb-0">Featured products</h2>
+    <a href="{{ url_for('shop.products') }}" class="text-decoration-none">View all →</a>
+  </div>
+  {% if featured %}
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
+      {% for product in featured %}
+        {% include "partials/_product_card.html" %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted">No products yet. Admin can add some from the dashboard.</p>
+  {% endif %}
+</section>
+
+<section class="row text-center mt-5 g-4">
+  <div class="col-md-4"><div class="p-3"><i class="bi bi-shield-check fs-2 text-primary"></i><h5 class="mt-2">Secure checkout</h5><p class="text-muted small">Your data stays safe.</p></div></div>
+  <div class="col-md-4"><div class="p-3"><i class="bi bi-truck fs-2 text-primary"></i><h5 class="mt-2">Fast shipping</h5><p class="text-muted small">Quick delivery on every order.</p></div></div>
+  <div class="col-md-4"><div class="p-3"><i class="bi bi-headset fs-2 text-primary"></i><h5 class="mt-2">Friendly support</h5><p class="text-muted small">We're here to help.</p></div></div>
+</section>
+{% endblock %}

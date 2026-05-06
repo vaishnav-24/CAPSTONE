@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Checkout — ShopLite{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4">Checkout</h1>
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Shipping details</h5>
+        <form method="post" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="mb-3">
+            {{ form.shipping_name.label(class="form-label") }}
+            {{ form.shipping_name(class="form-control") }}
+          </div>
+          <div class="mb-3">
+            {{ form.shipping_address.label(class="form-label") }}
+            {{ form.shipping_address(class="form-control") }}
+          </div>
+          <div class="row">
+            <div class="col-md-8 mb-3">
+              {{ form.shipping_city.label(class="form-label") }}
+              {{ form.shipping_city(class="form-control") }}
+            </div>
+            <div class="col-md-4 mb-3">
+              {{ form.shipping_zip.label(class="form-label") }}
+              {{ form.shipping_zip(class="form-control") }}
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Payment</label>
+            <div class="form-control bg-light text-muted">Demo payment — no real charge</div>
+          </div>
+          {{ form.submit(class="btn btn-success w-100") }}
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title mb-3">Order summary</h5>
+        <ul class="list-group list-group-flush mb-3">
+          {% for entry in items %}
+            <li class="list-group-item d-flex justify-content-between">
+              <span>{{ entry.product.name }} × {{ entry.quantity }}</span>
+              <span>${{ '%.2f'|format(entry.line_total) }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+        <div class="d-flex justify-content-between fw-bold fs-5">
+          <span>Total</span>
+          <span class="text-primary">${{ '%.2f'|format(total) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

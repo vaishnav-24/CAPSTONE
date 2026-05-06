@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Products — ShopLite{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4">All products</h1>
+
+{% if pagination.items %}
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+    {% for product in pagination.items %}
+      {% include "partials/_product_card.html" %}
+    {% endfor %}
+  </div>
+
+  {% if pagination.pages > 1 %}
+    <nav class="mt-4">
+      <ul class="pagination justify-content-center">
+        {% for p in pagination.iter_pages() %}
+          {% if p %}
+            <li class="page-item {% if p == pagination.page %}active{% endif %}">
+              <a class="page-link" href="{{ url_for('shop.products', page=p) }}">{{ p }}</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link">…</span></li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </nav>
+  {% endif %}
+{% else %}
+  <div class="alert alert-info">No products available yet.</div>
+{% endif %}
+{% endblock %}

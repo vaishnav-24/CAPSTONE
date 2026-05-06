@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Admin — {{ action }}{% endblock %}
+{% block content %}
+<h1 class="h4 mb-3">{{ action }}</h1>
+<div class="card shadow-sm">
+  <div class="card-body">
+    <form method="post" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="mb-3">
+        {{ form.name.label(class="form-label") }}
+        {{ form.name(class="form-control") }}
+      </div>
+      <div class="mb-3">
+        {{ form.description.label(class="form-label") }}
+        {{ form.description(class="form-control", rows=4) }}
+      </div>
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          {{ form.price.label(class="form-label") }}
+          {{ form.price(class="form-control") }}
+        </div>
+        <div class="col-md-4 mb-3">
+          {{ form.stock_quantity.label(class="form-label") }}
+          {{ form.stock_quantity(class="form-control") }}
+        </div>
+        <div class="col-md-4 mb-3 d-flex align-items-end">
+          <div class="form-check">
+            {{ form.is_active(class="form-check-input") }}
+            {{ form.is_active.label(class="form-check-label ms-1") }}
+          </div>
+        </div>
+      </div>
+      <div class="mb-3">
+        {{ form.image_url.label(class="form-label") }}
+        {{ form.image_url(class="form-control", placeholder="https://...") }}
+        {% for err in form.image_url.errors %}<div class="text-danger small">{{ err }}</div>{% endfor %}
+      </div>
+      <div class="d-flex gap-2">
+        {{ form.submit(class="btn btn-primary") }}
+        <a href="{{ url_for('admin.products') }}" class="btn btn-outline-secondary">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

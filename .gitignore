@@ -1,0 +1,11 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.env
+app.db
+*.sqlite
+.vscode/
+.idea/
+*.zip
+migrations/versions/__pycache__/

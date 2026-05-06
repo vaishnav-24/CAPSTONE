@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Cart — ShopLite{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4">Your cart</h1>
+
+{% if items %}
+  <div class="card shadow-sm">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th style="width: 160px;">Quantity</th>
+            <th>Subtotal</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in items %}
+            <tr>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <img src="{{ entry.product.image_url or 'https://placehold.co/60x60?text=P' }}" width="60" height="60" class="rounded" style="object-fit: cover;" />
+                  <a href="{{ url_for('shop.product_detail', product_id=entry.product.id) }}" class="text-decoration-none">{{ entry.product.name }}</a>
+                </div>
+              </td>
+              <td>${{ '%.2f'|format(entry.product.price) }}</td>
+              <td>
+                <form method="post" action="{{ url_for('shop.update_cart', product_id=entry.product.id) }}" class="d-flex gap-1">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                  <input type="number" name="quantity" value="{{ entry.quantity }}" min="0" max="{{ entry.product.stock_quantity }}" class="form-control form-control-sm" />
+                  <button class="btn btn-sm btn-outline-secondary"><i class="bi bi-arrow-repeat"></i></button>
+                </form>
+              </td>
+              <td class="fw-semibold">${{ '%.2f'|format(entry.line_total) }}</td>
+              <td class="text-end">
+                <form method="post" action="{{ url_for('shop.remove_from_cart', product_id=entry.product.id) }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                  <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" class="text-end fw-semibold">Total</td>
+            <td colspan="2" class="fw-bold text-primary fs-5">${{ '%.2f'|format(total) }}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="text-end mt-3">
+    <a href="{{ url_for('shop.products') }}" class="btn btn-outline-secondary">Continue shopping</a>
+    <a href="{{ url_for('shop.checkout') }}" class="btn btn-success"><i class="bi bi-credit-card"></i> Proceed to checkout</a>
+  </div>
+{% else %}
+  <div class="alert alert-info">Your cart is empty. <a href="{{ url_for('shop.products') }}">Browse products →</a></div>
+{% endif %}
+{% endblock %}

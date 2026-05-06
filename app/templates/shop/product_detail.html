@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }} — ShopLite{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="bg-white rounded-3 shadow-sm p-3 text-center">
+      <img src="{{ product.image_url or 'https://placehold.co/600x500?text=Product' }}" alt="{{ product.name }}" class="img-fluid rounded" style="max-height: 420px; object-fit: contain;" />
+    </div>
+  </div>
+  <div class="col-md-6">
+    <h1 class="h3">{{ product.name }}</h1>
+    <p class="text-primary fs-3 fw-bold">${{ '%.2f'|format(product.price) }}</p>
+    <p class="text-muted">{{ product.description }}</p>
+    <p>
+      {% if product.stock_quantity > 0 %}
+        <span class="badge bg-success">In stock ({{ product.stock_quantity }})</span>
+      {% else %}
+        <span class="badge bg-danger">Out of stock</span>
+      {% endif %}
+    </p>
+
+    {% if product.stock_quantity > 0 %}
+      <form method="post" action="{{ url_for('shop.add_to_cart', product_id=product.id) }}" class="row g-2 align-items-end">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <div class="col-auto">
+          <label class="form-label small mb-0">Quantity</label>
+          <input type="number" name="quantity" value="1" min="1" max="{{ product.stock_quantity }}" class="form-control" style="width: 100px;" />
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-primary" type="submit"><i class="bi bi-cart-plus"></i> Add to cart</button>
+        </div>
+      </form>
+    {% endif %}
+
+    <a href="{{ url_for('shop.products') }}" class="btn btn-link mt-3 ps-0">← Back to products</a>
+  </div>
+</div>
+{% endblock %}
