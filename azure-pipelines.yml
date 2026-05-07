@@ -6,8 +6,8 @@ trigger:
 variables:
   pythonVersion: '3.11'
   azureSubscription: 'sc-capstone-azure'
-  qaAppName: 'ecommerce-qa-capstone'
-  prodAppName: 'ecommerce-prod-capstone'
+  qaAppName: 'ecommerce-qa-1'
+  prodAppName: 'ecommerce-prod-1'
   minCoveragePct: '0'
 
 stages:
