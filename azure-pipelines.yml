@@ -5,7 +5,7 @@ trigger:
 
 variables:
   pythonVersion: '3.11'
-  azureSubscription: 'sc-capstone'
+  azureSubscription: 'sc-capstone-azure'
   qaAppName: 'ecommerce-qa-capstone'
   prodAppName: 'ecommerce-prod-capstone'
   minCoveragePct: '60'   # Fail the quality gate if test coverage drops below this %
