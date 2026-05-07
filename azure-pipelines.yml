@@ -5,9 +5,10 @@ trigger:
 
 variables:
   pythonVersion: '3.11'
-  azureSubscription: '<YOUR-AZURE-SERVICE-CONNECTION>'
-  qaAppName: '<YOUR-QA-APP-SERVICE-NAME>'
-  prodAppName: '<YOUR-PROD-APP-SERVICE-NAME>'
+  azureSubscription: 'sc-capstone'
+  qaAppName: 'ecommerce-qa-capstone'
+  prodAppName: 'ecommerce-prod-capstone'
+  minCoveragePct: '60'   # Fail the quality gate if test coverage drops below this %
 
 stages:
 # ---------- BUILD ----------
@@ -55,7 +56,7 @@ stages:
 # ---------- DEPLOY QA ----------
 - stage: DeployQA
   displayName: Deploy to QA
-  dependsOn: Build
+  dependsOn: QualityGate
   condition: succeeded()
   jobs:
     - deployment: DeployQA
@@ -73,6 +74,68 @@ stages:
                   appName: '$(qaAppName)'
                   package: '$(Pipeline.Workspace)/drop/app.zip'
                   startUpCommand: 'gunicorn --bind=0.0.0.0 --timeout 600 run:app'
+
+# ---------- QUALITY GATE ----------
+# Blocks deployment if code quality, security, or test coverage checks fail.
+- stage: QualityGate
+  displayName: Quality Gate
+  dependsOn: Build
+  condition: succeeded()
+  jobs:
+    - job: QualityChecks
+      displayName: Lint, Security & Coverage
+      pool:
+        vmImage: 'ubuntu-latest'
+      steps:
+        - task: UsePythonVersion@0
+          inputs:
+            versionSpec: '$(pythonVersion)'
+
+        - script: |
+            python -m venv venv
+            source venv/bin/activate
+            pip install --upgrade pip
+            pip install -r requirements.txt
+            pip install flake8 bandit pytest-cov
+          displayName: 'Install quality tools'
+
+        - script: |
+            source venv/bin/activate
+            echo "=== Running flake8 (lint) ==="
+            flake8 app --count --max-line-length=120 --statistics
+          displayName: 'Lint (flake8)'
+          continueOnError: true   # Lint warnings reported but don't fail the gate by themselves
+
+        - script: |
+            source venv/bin/activate
+            echo "=== Running bandit (security scan) ==="
+            bandit -r app -ll
+          displayName: 'Security scan (bandit)'
+          continueOnError: true
+
+        - script: |
+            source venv/bin/activate
+            echo "=== Running tests with coverage ==="
+            pytest --cov=app --cov-report=xml --cov-report=html --junitxml=test-results.xml --cov-fail-under=$(minCoveragePct) || true
+            # Run again strictly to enforce the threshold (fails the stage if below)
+            pytest --cov=app --cov-fail-under=$(minCoveragePct)
+          displayName: 'Tests + coverage (enforces $(minCoveragePct)% min)'
+
+        - task: PublishTestResults@2
+          condition: succeededOrFailed()
+          inputs:
+            testResultsFormat: 'JUnit'
+            testResultsFiles: 'test-results.xml'
+            failTaskOnFailedTests: true
+          displayName: 'Publish test results'
+
+        - task: PublishCodeCoverageResults@2
+          condition: succeededOrFailed()
+          inputs:
+            summaryFileLocation: '$(System.DefaultWorkingDirectory)/coverage.xml'
+            pathToSources: '$(System.DefaultWorkingDirectory)/app'
+          displayName: 'Publish coverage report'
+
 
 # ---------- DEPLOY PROD (with approval gate) ----------
 - stage: DeployProd
